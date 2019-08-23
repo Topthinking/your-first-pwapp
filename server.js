@@ -23,10 +23,10 @@ const fetch = require('node-fetch');
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
 // CODELAB: Change this to add a delay (ms) before the server responds.
-const FORECAST_DELAY = 0;
+const FORECAST_DELAY = 3000;
 
 // CODELAB: If running locally, set your Dark Sky API key here
-const API_KEY = process.env.DARKSKY_API_KEY;
+const API_KEY = '6130afd55cc674cbb317b3b92b2926e8';
 const BASE_URL = `https://api.darksky.net/forecast`;
 
 // Fake forecast data used if we can't reach the Dark Sky API
@@ -131,7 +131,6 @@ function generateFakeForecast(location) {
   return result;
 }
 
-
 /**
  * Gets the weather forecast from the Dark Sky API for the given location.
  *
@@ -141,19 +140,22 @@ function generateFakeForecast(location) {
 function getForecast(req, resp) {
   const location = req.params.location || '40.7720232,-73.9732319';
   const url = `${BASE_URL}/${API_KEY}/${location}`;
-  fetch(url).then((resp) => {
-    if (resp.status !== 200) {
-      throw new Error(resp.statusText);
-    }
-    return resp.json();
-  }).then((data) => {
-    setTimeout(() => {
-      resp.json(data);
-    }, FORECAST_DELAY);
-  }).catch((err) => {
-    console.error('Dark Sky API Error:', err.message);
-    resp.json(generateFakeForecast(location));
-  });
+  fetch(url)
+    .then((resp) => {
+      if (resp.status !== 200) {
+        throw new Error(resp.statusText);
+      }
+      return resp.json();
+    })
+    .then((data) => {
+      setTimeout(() => {
+        resp.json(data);
+      }, FORECAST_DELAY);
+    })
+    .catch((err) => {
+      console.error('Dark Sky API Error:', err.message);
+      resp.json(generateFakeForecast(location));
+    });
 }
 
 /**
